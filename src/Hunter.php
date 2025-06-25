@@ -52,6 +52,8 @@ class Hunter
 
     protected ?HunterResult $currentResult = null;
 
+    protected int $chunk = 250;
+
     public function __construct()
     {
         $this->queryModifiers      = collect();
@@ -64,6 +66,14 @@ class Hunter
 
     public static function for(string $modelClass): self
     {
+        if (! class_exists($modelClass)) {
+            throw new \InvalidArgumentException("Model class '{$modelClass}' does not exist");
+        }
+
+        if (! is_subclass_of($modelClass, Model::class)) {
+            throw new \InvalidArgumentException("Class '{$modelClass}' must extend Illuminate\Database\Eloquent\Model");
+        }
+
         $instance             = new self();
         $instance->modelClass = $modelClass;
 
@@ -155,6 +165,24 @@ class Hunter
         return $this;
     }
 
+    public function withoutLogging(): self
+    {
+        $this->logErrors = false;
+
+        return $this;
+    }
+
+    public function chunk(int $size): self
+    {
+        if ($size <= 0) {
+            throw new \InvalidArgumentException('Chunk size must be greater than zero');
+        }
+
+        $this->chunk = $size;
+
+        return $this;
+    }
+
     public function skip(?Model $record = null, ?string $reason = null): self
     {
         $this->shouldSkipCurrentRecord = true;
@@ -219,96 +247,96 @@ class Hunter
 
     public function hunt(): HunterResult
     {
-        $query   = $this->buildQuery();
-        $records = $query->get();
-
+        $query                  = $this->buildQuery();
         $result                 = new HunterResult();
-        $result->total          = $records->count();
+        $result->total          = $query->count();
         $result->skipped        = 0;
         $result->skippedRecords = [];
         $result->skipReasons    = [];
 
         $this->currentResult = $result;
 
-        if (blank($records)) {
+        if ($result->total === 0) {
             return $result;
         }
 
-        $records->each(function ($record) use ($result): void {
-            // Reset flow control for each record
-            $this->shouldSkipCurrentRecord = false;
-            $this->skipReason              = null;
-            $this->currentRecord           = $record;
+        $query->chunk($this->chunk, function ($records) use ($result): void {
+            $records->each(function ($record) use ($result): void {
+                // Reset flow control for each record
+                $this->shouldSkipCurrentRecord = false;
+                $this->skipReason              = null;
+                $this->currentRecord           = $record;
 
-            // Check if we should stop processing entirely
-            if ($this->shouldStopProcessing) {
-                $result->skipped++;
-                $recordId                 = $this->getRecordIdentifier($record);
-                $result->skippedRecords[] = $recordId;
+                // Check if we should stop processing entirely
+                if ($this->shouldStopProcessing) {
+                    $result->skipped++;
+                    $recordId                 = $this->getRecordIdentifier($record);
+                    $result->skippedRecords[] = $recordId;
 
-                if (filled($this->stopReason)) {
-                    $result->skipReasons[$recordId] = "Stopped: {$this->stopReason}";
-                }
-
-                return;
-            }
-
-            try {
-                // Hook: Before Then
-                $this->executeCallbacks($this->beforeThenCallbacks, $record);
-
-                // Check if the record was skipped in onBeforeThen
-                if ($this->shouldSkipCurrentRecord) {
-                    $this->handleSkipReason($record, $result);
+                    if (filled($this->stopReason)) {
+                        $result->skipReasons[$recordId] = "Stopped: {$this->stopReason}";
+                    }
 
                     return;
                 }
 
-                // Main actions
-                $this->executeCallbacks($this->individualActions, $record);
+                try {
+                    // Hook: Before Then
+                    $this->executeCallbacks($this->beforeThenCallbacks, $record);
 
-                // Check if the record was skipped in then
-                if ($this->shouldSkipCurrentRecord) {
-                    $this->handleSkipReason($record, $result);
+                    // Check if the record was skipped in onBeforeThen
+                    if ($this->shouldSkipCurrentRecord) {
+                        $this->handleSkipReason($record, $result);
 
-                    return;
+                        return;
+                    }
+
+                    // Main actions
+                    $this->executeCallbacks($this->individualActions, $record);
+
+                    // Check if the record was skipped in then
+                    if ($this->shouldSkipCurrentRecord) {
+                        $this->handleSkipReason($record, $result);
+
+                        return;
+                    }
+
+                    // Hook: After Then
+                    $this->executeCallbacks($this->afterThenCallbacks, $record);
+
+                    // Check if the record was skipped in onAfterThen
+                    if ($this->shouldSkipCurrentRecord) {
+                        $this->handleSkipReason($record, $result);
+
+                        return;
+                    }
+
+                    $result->successful++;
+
+                    // Success callbacks
+                    $this->executeCallbacks($this->successCallbacks, $record);
+                } catch (Throwable $e) {
+                    // Skip if the record was already marked as failed via fail() method
+                    if ($this->shouldSkipCurrentRecord) {
+                        return;
+                    }
+
+                    $result->failed++;
+                    $result->errors[$this->getRecordIdentifier($record)] = $e->getMessage();
+
+                    if ($this->logErrors) {
+                        Log::error("Hunter error in {$this->logContext}", [
+                            'model' => $record::class,
+                            'id'    => $record->getKey(),
+                            'error' => $e->getMessage(),
+                            'trace' => $e->getTraceAsString(),
+                        ]);
+                    }
+
+                    // Error callbacks
+                    $this->executeErrorCallbacks($this->errorCallbacks, $record, $e);
                 }
-
-                // Hook: After Then
-                $this->executeCallbacks($this->afterThenCallbacks, $record);
-
-                // Check if the record was skipped in onAfterThen
-                if ($this->shouldSkipCurrentRecord) {
-                    $this->handleSkipReason($record, $result);
-
-                    return;
-                }
-
-                $result->successful++;
-
-                // Success callbacks
-                $this->executeCallbacks($this->successCallbacks, $record);
-            } catch (Throwable $e) {
-                // Skip if the record was already marked as failed via fail() method
-                if ($this->shouldSkipCurrentRecord) {
-                    return;
-                }
-
-                $result->failed++;
-                $result->errors[$this->getRecordIdentifier($record)] = $e->getMessage();
-
-                if ($this->logErrors) {
-                    Log::error("Hunter error in {$this->logContext}", [
-                        'model' => $record::class,
-                        'id'    => $record->getKey(),
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                }
-
-                // Error callbacks
-                $this->executeErrorCallbacks($this->errorCallbacks, $record, $e);
-            }
+            });
         });
 
         $this->currentRecord = null;
