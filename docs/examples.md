@@ -606,6 +606,105 @@ echo "- Failed: {$result->failed}\n";
 echo "- Skipped: {$result->skipped}\n";
 echo "- Execution time: {$result->getExecutionTime()}s\n";
 echo "- Memory usage: {$result->getFormattedMemoryUsage()}\n";
+
+// Display results in a beautiful console table
+$result->consoleTable();
+```
+
+---
+
+## Result Reporting and Display
+
+### Console Table Output
+
+Hunter provides a beautiful console table display using Laravel Prompts for better result visualization:
+
+```php
+$result = Hunter::for(User::class)
+    ->find('status', 'pending')
+    ->onProgress(function ($processed, $total, $percentage) {
+        echo "Processing: {$percentage}%\n";
+    })
+    ->then(function ($user) {
+        $user->update(['processed' => true]);
+    })
+    ->hunt();
+
+// Display results in a formatted table
+$result->consoleTable();
+
+/*
+Output:
+┌─────────────────┬─────────┬──────────┐
+│ Metric          │ Value   │ Details  │
+├─────────────────┼─────────┼──────────┤
+│ Total Records   │ 1,250   │          │
+│ Successful      │ 1,200   │ 96.0%    │
+│ Failed          │ 25      │ 2.0%     │
+│ Skipped         │ 25      │ 2.0%     │
+│ Execution Time  │ 45.67s  │          │
+│ Memory Usage    │ 32.5 MB │          │
+│ Status          │ Completed│         │
+│ Processing Rate │ 27.4 records/sec │ │
+└─────────────────┴─────────┴──────────┘
+
+⚠️  25 record(s) failed to process. Check logs for details.
+ℹ️  25 record(s) were skipped.
+
+Skip reasons:
+  • Missing email address: 15 record(s)
+  • Account locked: 10 record(s)
+*/
+```
+
+### Comparing Results
+
+```php
+// Compare dry run vs actual execution
+$dryResult = Hunter::for(User::class)
+    ->find('status', 'inactive')
+    ->dryRun()
+    ->then(fn($user) => $user->delete())
+    ->hunt();
+
+echo "=== DRY RUN RESULTS ===\n";
+$dryResult->consoleTable();
+
+if (confirm("Proceed with actual execution?")) {
+    $realResult = Hunter::for(User::class)
+        ->find('status', 'inactive')
+        ->then(fn($user) => $user->delete())
+        ->hunt();
+
+    echo "\n=== ACTUAL EXECUTION RESULTS ===\n";
+    $realResult->consoleTable();
+}
+```
+
+### Laravel Command Integration with Console Output
+
+```php
+class ProcessUsersCommand extends Command
+{
+    public function handle(): int
+    {
+        $result = Hunter::for(User::class)
+            ->find('status', 'pending')
+            ->onProgress(function ($processed, $total, $percentage) {
+                $this->line("Processing: {$percentage}% ({$processed}/{$total})");
+            })
+            ->then(function ($user) {
+                $user->update(['processed' => true]);
+            })
+            ->hunt();
+
+        $this->newLine();
+        $this->info('Processing completed! Results:');
+        $result->consoleTable();
+
+        return $result->hasErrors() ? self::FAILURE : self::SUCCESS;
+    }
+}
 ```
 
 ### External API Synchronization

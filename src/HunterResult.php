@@ -125,4 +125,60 @@ class HunterResult
 
         return round($bytes, 2) . ' ' . $units[$i];
     }
+
+    public function consoleTable(): void
+    {
+        if (! function_exists('\Laravel\Prompts\table')) {
+            echo $this->summary() . "\n";
+
+            return;
+        }
+
+        $headers = ['Metric', 'Value', 'Details'];
+        $rows    = [
+            ['Total Records', number_format($this->total), ''],
+            ['Successful', number_format($this->successful), $this->total > 0 ? sprintf('%.1f%%', $this->getSuccessRate()) : ''],
+            ['Failed', number_format($this->failed), $this->failed > 0 ? sprintf('%.1f%%', ($this->failed / $this->total) * 100) : ''],
+            ['Skipped', number_format($this->skipped), $this->skipped > 0 ? sprintf('%.1f%%', ($this->skipped / $this->total) * 100) : ''],
+        ];
+
+        // Add execution metrics if available
+        if ($this->executionTime > 0) {
+            $rows[] = ['Execution Time', sprintf('%.2fs', $this->executionTime), ''];
+        }
+
+        if ($this->memoryUsage > 0) {
+            $rows[] = ['Memory Usage', $this->getFormattedMemoryUsage(), ''];
+        }
+
+        $rows[] = $this->wasStopped() ? ['Status', 'Stopped', $this->stopReason] : ['Status', 'Completed', ''];
+
+        if ($this->executionTime > 0 && $this->total > 0) {
+            $rate   = $this->total / $this->executionTime;
+            $rows[] = ['Processing Rate', sprintf('%.1f records/sec', $rate), ''];
+        }
+
+        \Laravel\Prompts\table(
+            headers: $headers,
+            rows: $rows
+        );
+
+        if ($this->hasErrors()) {
+            echo "\n";
+            \Laravel\Prompts\warning("⚠️  {$this->failed} record(s) failed to process. Check logs for details.");
+        }
+
+        if ($this->hasSkipped()) {
+            echo "\n";
+            \Laravel\Prompts\info("ℹ️  {$this->skipped} record(s) were skipped.");
+
+            if ($this->hasSkipReasons()) {
+                echo "\nSkip reasons:\n";
+
+                foreach (array_count_values($this->skipReasons) as $reason => $count) {
+                    echo "  • {$reason}: {$count} record(s)\n";
+                }
+            }
+        }
+    }
 }

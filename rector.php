@@ -18,5 +18,6 @@ return RectorConfig::configure()
     )
     ->withSkip([
         Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector::class,
+        \Rector\Php55\Rector\String_\StringClassNameToClassConstantRector::class,
     ])
     ->withPhpSets();
