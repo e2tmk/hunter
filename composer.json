@@ -32,7 +32,10 @@
     "autoload": {
         "psr-4": {
             "Hunter\\": "src/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "scripts": {
         "format": "vendor/bin/pint"

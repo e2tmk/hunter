@@ -24,7 +24,7 @@ This document contains practical examples of using Hunter for different scenario
 use Hunter\Hunter;
 use App\Models\User;
 
-// Activate all inactive users
+// Activate all inactive users using the class method
 $result = Hunter::for(User::class)
     ->find('status', 'inactive')
     ->then(function ($user) {
@@ -33,7 +33,17 @@ $result = Hunter::for(User::class)
     ->hunt();
 
 echo "Users activated: {$result->successful}";
+
+// Or use the convenient helper function
+$result = hunter(User::class)
+    ->find('status', 'inactive')
+    ->then(function ($user) {
+        $user->update(['status' => 'active']);
+    })
+    ->hunt();
 ```
+
+````
 
 ### Search with Operators
 
@@ -45,7 +55,7 @@ $result = Hunter::for(User::class)
         $user->update(['welcome_email_sent' => true]);
     })
     ->hunt();
-```
+````
 
 ### Custom Query Building
 
