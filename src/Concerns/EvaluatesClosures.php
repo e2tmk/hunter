@@ -11,7 +11,7 @@ use ReflectionNamedType;
 use ReflectionParameter;
 
 /**
- * @note Original code is from filamentphp/filament (Filament\Support\Concerns\EvaluatesClosures)
+ * @note The original code is from filamentphp/filament (Filament\Support\Concerns\EvaluatesClosures)
  */
 trait EvaluatesClosures
 {
