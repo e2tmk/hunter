@@ -2,6 +2,19 @@
 
 All notable changes to `hunter` will be documented in this file.
 
+## v1.1.1 - 2025-06-25
+
+### What's Changed
+
+* Bump stefanzweifel/git-auto-commit-action from 5 to 6 by @dependabot in https://github.com/e2tmk/hunter/pull/1
+* feat: Add console table display with Laravel Prompts  by @andrefelipe18 in https://github.com/e2tmk/hunter/pull/3
+
+### New Contributors
+
+* @dependabot made their first contribution in https://github.com/e2tmk/hunter/pull/1
+
+**Full Changelog**: https://github.com/e2tmk/hunter/compare/v1.1.0...v1.1.1
+
 ## v1.1.0 - 2025-06-25
 
 ### What's Changed
