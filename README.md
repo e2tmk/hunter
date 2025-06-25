@@ -38,8 +38,6 @@ echo $result->summary(); // "Total: 15, Successful: 14, Failed: 1, Skipped: 0"
 -   🎯 **Multiple Actions**: Execute several actions per record
 -   ⚡ **Flow Control**: Skip, fail, or stop processing gracefully
 -   📊 **Comprehensive Reporting**: Detailed statistics and error tracking
--   🔧 **Laravel Integration**: Built for Laravel/Eloquent
--   📝 **Advanced Logging**: Configurable logging with context
 
 ## Documentation
 

@@ -22,6 +22,10 @@ class HunterResult
 
     public ?string $stopReason = null;
 
+    public float $executionTime = 0;
+
+    public int $memoryUsage = 0;
+
     public function hasErrors(): bool
     {
         return $this->failed > 0;
@@ -95,6 +99,30 @@ class HunterResult
             'stop_reason'     => $this->stopReason,
             'success_rate'    => $this->getSuccessRate(),
             'processed_count' => $this->getProcessedCount(),
+            'execution_time'  => $this->executionTime,
+            'memory_usage'    => $this->memoryUsage,
         ];
+    }
+
+    public function getExecutionTime(): float
+    {
+        return $this->executionTime;
+    }
+
+    public function getMemoryUsage(): int
+    {
+        return $this->memoryUsage;
+    }
+
+    public function getFormattedMemoryUsage(): string
+    {
+        $bytes = $this->memoryUsage;
+        $units = ['B', 'KB', 'MB', 'GB'];
+
+        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, 2) . ' ' . $units[$i];
     }
 }

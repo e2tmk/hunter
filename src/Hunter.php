@@ -36,6 +36,8 @@ class Hunter
 
     protected ?Collection $errorCallbacks = null;
 
+    protected ?Closure $progressCallback = null;
+
     protected bool $logErrors = true;
 
     protected string $logContext = 'hunter';
@@ -53,6 +55,8 @@ class Hunter
     protected ?HunterResult $currentResult = null;
 
     protected int $chunk = 250;
+
+    protected bool $dryRun = false;
 
     public function __construct()
     {
@@ -157,6 +161,13 @@ class Hunter
         return $this;
     }
 
+    public function onProgress(Closure $callback): self
+    {
+        $this->progressCallback = $callback;
+
+        return $this;
+    }
+
     public function withLogging(string $context = 'hunter'): self
     {
         $this->logErrors  = true;
@@ -245,8 +256,18 @@ class Hunter
         return $this->stopReason;
     }
 
+    public function dryRun(bool $enabled = true): self
+    {
+        $this->dryRun = $enabled;
+
+        return $this;
+    }
+
     public function hunt(): HunterResult
     {
+        $startTime   = microtime(true);
+        $startMemory = memory_get_usage(true);
+
         $query                  = $this->buildQuery();
         $result                 = new HunterResult();
         $result->total          = $query->count();
@@ -257,6 +278,9 @@ class Hunter
         $this->currentResult = $result;
 
         if ($result->total === 0) {
+            $result->executionTime = microtime(true) - $startTime;
+            $result->memoryUsage   = memory_get_usage(true) - $startMemory;
+
             return $result;
         }
 
@@ -291,6 +315,14 @@ class Hunter
                         return;
                     }
 
+                    // Check if we're in dry run mode
+                    if ($this->dryRun) {
+                        $result->successful++;
+                        $this->reportProgress($result);
+
+                        return;
+                    }
+
                     // Main actions
                     $this->executeCallbacks($this->individualActions, $record);
 
@@ -315,6 +347,9 @@ class Hunter
 
                     // Success callbacks
                     $this->executeCallbacks($this->successCallbacks, $record);
+
+                    // Report progress
+                    $this->reportProgress($result);
                 } catch (Throwable $e) {
                     // Skip if the record was already marked as failed via fail() method
                     if ($this->shouldSkipCurrentRecord) {
@@ -341,6 +376,9 @@ class Hunter
 
         $this->currentRecord = null;
         $this->currentResult = null;
+
+        $result->executionTime = microtime(true) - $startTime;
+        $result->memoryUsage   = memory_get_usage(true) - $startMemory;
 
         return $result;
     }
@@ -426,5 +464,74 @@ class Hunter
         $class = class_basename($this->modelClass);
 
         return lcfirst($class);
+    }
+
+    protected function reportProgress(HunterResult $result): void
+    {
+        if ($this->progressCallback && $result->total > 0) {
+            $processed  = $result->successful + $result->failed + $result->skipped;
+            $percentage = ($processed / $result->total) * 100;
+
+            $this->evaluate($this->progressCallback, [
+                'processed'  => $processed,
+                'total'      => $result->total,
+                'percentage' => round($percentage, 2),
+                'successful' => $result->successful,
+                'failed'     => $result->failed,
+                'skipped'    => $result->skipped,
+                'result'     => $result,
+                'hunter'     => $this,
+            ]);
+        }
+    }
+
+    public function whereIn(string $column, array $values): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->whereIn($column, $values));
+    }
+
+    public function whereNull(string $column): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->whereNull($column));
+    }
+
+    public function whereNotNull(string $column): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->whereNotNull($column));
+    }
+
+    public function whereBetween(string $column, array $values): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->whereBetween($column, $values));
+    }
+
+    public function orderBy(string $column, string $direction = 'asc'): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->orderBy($column, $direction));
+    }
+
+    public function latest(string $column = 'created_at'): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->latest($column));
+    }
+
+    public function oldest(string $column = 'created_at'): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->oldest($column));
+    }
+
+    public function limit(int $limit): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->limit($limit));
+    }
+
+    public function offset(int $offset): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->offset($offset));
+    }
+
+    public function with(array | string $relations): self
+    {
+        return $this->modifyQueryUsing(fn ($query) => $query->with($relations));
     }
 }
