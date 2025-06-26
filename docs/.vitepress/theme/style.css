@@ -110,14 +110,14 @@
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: -webkit-linear-gradient(
     120deg,
-    #7c3aed 30%,
-    #ea580c
+    #ea580c 30%,
+    #7c3aed
   );
 
   --vp-home-hero-image-background-image: linear-gradient(
     -45deg,
-    #7c3aed 50%,
-    #ea580c 50%
+    #ea580c 50%,
+    #7c3aed 50%
   );
   --vp-home-hero-image-filter: blur(44px);
 }
@@ -155,4 +155,72 @@
 
 .DocSearch {
   --docsearch-primary-color: var(--vp-c-brand-1) !important;
+}
+
+.home-footer {
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.footer-logo {
+  flex-shrink: 0;
+  transition: opacity 0.3s ease;
+}
+
+.footer-logo:hover {
+  opacity: 0.8;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--vp-c-border) 20%,
+    var(--vp-c-border) 80%,
+    transparent
+  );
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .home-footer {
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+  
+  .footer-logo {
+    width: 80px;
+  }
+  
+  .footer-divider {
+    height: 40px;
+  }
+}
+
+.hunter-logo {
+  margin-top: 2.2rem;
+}
+
+.hunter-logo-light {
+  display: block;
+}
+
+.hunter-logo-dark {
+  display: none;
+}
+
+.dark .hunter-logo-light {
+  display: none;
+}
+
+.dark .hunter-logo-dark {
+  display: block;
 }
