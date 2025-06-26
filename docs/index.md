@@ -1,63 +1,56 @@
-<script setup>
-import { onMounted } from 'vue';
+---
+# https://vitepress.dev/reference/default-theme-home-page
+layout: home
 
-onMounted(() => {
-    const titleLink = document.querySelector('a.title');
-    const span = titleLink?.querySelector('span');
-    span?.remove();
+hero:
+    name: "Hunter"
+    tagline: Powerful utility for finding and processing Eloquent model records with a fluent, chainable API
+    image:
+        src: /Hunter_icon_purple-600.png
+        alt: Hunter logo
+    actions:
+        - theme: brand
+          text: Introduction
+          link: /introduction
 
-    titleLink.style.display = 'flex';
-    titleLink.style.justifyContent = 'center';
-    titleLink.style.alignItems = 'center';
+features:
+    - icon: 🔍
+      title: Powerful Search
+      details: Find records with flexible criteria using an intuitive query builder interface.
 
-    titleLink.querySelectorAll('img')?.forEach(img => {
-        img.style.width = '42px';
-        img.style.height = '42px';
-        img.style.marginRight = '8px';
-    });
-});
-</script>
+    - icon: 🔗
+      title: Fluent API
+      details: Chainable methods for clean, readable code that's easy to understand and maintain.
 
-# Introduction
+    - icon: 🎯
+      title: Multiple Actions
+      details: Execute several actions per record with comprehensive flow control and error handling.
 
-`Hunter` is a powerful utility for finding and processing Eloquent model records with a fluent, chainable API.
-It provides a clean way to search for records based on specific criteria and execute multiple actions on them with
-comprehensive error handling, logging, and advanced flow control.
+    - icon: ⚡
+      title: Flow Control
+      details: Skip, fail, or stop processing gracefully with detailed feedback and logging.
 
-# Installation
+    - icon: 📊
+      title: Comprehensive Reporting
+      details: Detailed statistics and error tracking with complete processing summaries.
 
-To install `Hunter`, you can use Composer. Run the following command in your terminal:
+    - icon: 🛡️
+      title: Error Handling
+      details: Robust error handling with logging, recovery options, and graceful degradation.
+---
 
-```bash
-composer require e2tmk/hunter
-```
-
-# Usage
-
-```php
-use Hunter\Hunter;
-
-Hunter::for(Campaign::class)
-    ->find('scheduled_at', now())
-    >modifyQueryUsing(fn($query) => $query->where('status', 'scheduled'))
-    ->onBeforeThen(function (Campaign $campaign, Hunter $hunter) {
-        // Validation with graceful failure
-        if (!$campaign->hasContacts()) {
-            $hunter->skip($campaign, 'No contacts to send to');
-            return;
-        }
-    })
-    ->then(function (Campaign $campaign) {
-        ProcessCampaignJob::dispatch($campaign);
-    })
-    ->onAfterThen(function (Campaign $campaign) {
-        $campaign->update(['status' => 'processing']);
-    })
-    ->hunt();
-
-// Or using the helper function
-
-hunter(Campaign::class)
-    ->find(...)
-    ->hunt();
-```
+<div class="home-footer">
+  <div class="footer-text">
+    Open Source Package By E2TMK
+  </div>
+  
+  <div class="footer-divider"></div>
+  
+  <img src="/Hunter_icon_zinc-50.png"
+    width="120" 
+    alt="Hunter logo" class="footer-logo hunter-logo-dark" />
+  
+  <img src="/Hunter_icon_purple-600.png"
+    width="120" 
+    alt="Hunter logo" class="footer-logo hunter-logo-light" />
+</div>
