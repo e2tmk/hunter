@@ -2,6 +2,16 @@
 
 All notable changes to `hunter` will be documented in this file.
 
+## v1.1.2 - 2025-06-26
+
+### What's Changed
+
+* docs: update docs with logo and style changes  by @andrefelipe18 in https://github.com/e2tmk/hunter/pull/4
+* docs: Update styling and restructure documentation  by @andrefelipe18 in https://github.com/e2tmk/hunter/pull/5
+* docs: add link to E2TMK in footer text  by @andrefelipe18 in https://github.com/e2tmk/hunter/pull/6
+
+**Full Changelog**: https://github.com/e2tmk/hunter/compare/v1.1.1...v1.1.2
+
 ## v1.1.1 - 2025-06-25
 
 ### What's Changed
