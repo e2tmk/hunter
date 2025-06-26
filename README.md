@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="docs/public/Hunter_icon_purple-600.png" alt="Hunter Logo" width="200">
+</p>
+
 # Hunter
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/e2tmk/hunter.svg?style=flat-square)](https://packagist.org/packages/e2tmk/hunter)
