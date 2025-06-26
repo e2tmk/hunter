@@ -1,3 +1,23 @@
+<script setup>
+import { onMounted } from 'vue';
+
+onMounted(() => {
+    const titleLink = document.querySelector('a.title');
+    const span = titleLink?.querySelector('span');
+    span?.remove();
+
+    titleLink.style.display = 'flex';
+    titleLink.style.justifyContent = 'center';
+    titleLink.style.alignItems = 'center';
+
+    titleLink.querySelectorAll('img')?.forEach(img => {
+        img.style.width = '42px';
+        img.style.height = '42px';
+        img.style.marginRight = '8px';
+    });
+});
+</script>
+
 # API Reference
 
 ## Hunter Class
@@ -21,8 +41,6 @@ Creates a new Hunter instance for the specified Eloquent model.
 ```php
 $hunter = Hunter::for(User::class);
 ```
-
----
 
 ### Query Building Methods
 
@@ -58,8 +76,6 @@ $hunter->modifyQueryUsing(function ($query) {
     return $query->whereHas('posts');
 });
 ```
-
----
 
 ### Convenience Methods
 
@@ -103,8 +119,6 @@ Sets the query offset.
 
 Eager loads the specified relations.
 
----
-
 ### Action Methods
 
 #### `then(Closure $callback): self`
@@ -141,8 +155,6 @@ $hunter->thenIf(
     fn($user) => $user->delete()
 );
 ```
-
----
 
 ### Callback Methods
 
@@ -185,8 +197,6 @@ $hunter->onProgress(function ($processed, $total, $percentage) {
 });
 ```
 
----
-
 ### Configuration Methods
 
 #### `chunk(int $size): self`
@@ -213,8 +223,6 @@ Enables or disables dry run mode.
 
 **Note:** In dry run mode, the main actions are not executed, but callbacks and validations still run.
 
----
-
 ### Flow Control Methods
 
 #### `skip(?Model $record = null, ?string $reason = null): self`
@@ -228,8 +236,6 @@ Stops the entire processing operation.
 #### `fail(Model $record, string $reason): self`
 
 Marks a record as failed with a specific reason.
-
----
 
 ### Getter Methods
 
@@ -249,8 +255,6 @@ Returns the reason for skipping the current record.
 
 Returns the reason for stopping processing.
 
----
-
 ### Execution Method
 
 #### `hunt(): HunterResult`
@@ -258,8 +262,6 @@ Returns the reason for stopping processing.
 Executes the batch processing operation.
 
 **Returns:** `HunterResult` instance with processing statistics and results.
-
----
 
 ## HunterResult Class
 
@@ -304,8 +306,6 @@ Total execution time in seconds.
 #### `int $memoryUsage`
 
 Peak memory usage in bytes.
-
----
 
 ### Methods
 
@@ -365,8 +365,6 @@ Returns a brief summary string.
 
 Returns a detailed summary array with all statistics.
 
----
-
 ## Error Handling
 
 ### Exception Types
@@ -403,8 +401,6 @@ $hunter->onError(function ($record, $exception, $hunter) {
     $record->update(['retry_count' => $record->retry_count + 1]);
 });
 ```
-
----
 
 ## Best Practices
 

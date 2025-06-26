@@ -1,3 +1,23 @@
+<script setup>
+import { onMounted } from 'vue';
+
+onMounted(() => {
+    const titleLink = document.querySelector('a.title');
+    const span = titleLink?.querySelector('span');
+    span?.remove();
+
+    titleLink.style.display = 'flex';
+    titleLink.style.justifyContent = 'center';
+    titleLink.style.alignItems = 'center';
+
+    titleLink.querySelectorAll('img')?.forEach(img => {
+        img.style.width = '42px';
+        img.style.height = '42px';
+        img.style.marginRight = '8px';
+    });
+});
+</script>
+
 # Hunter Examples
 
 This document contains practical examples of using Hunter for different scenarios and use cases.
@@ -13,8 +33,6 @@ This document contains practical examples of using Hunter for different scenario
 7. [Flow Control](#flow-control)
 8. [Advanced Use Cases](#advanced-use-cases)
 9. [Performance Optimization](#performance-optimization)
-
----
 
 ## Basic Operations
 
@@ -73,8 +91,6 @@ $result = Hunter::for(User::class)
     ->hunt();
 ```
 
----
-
 ## Conditional Processing
 
 ### Using thenIf with Closures
@@ -120,8 +136,6 @@ $result = Hunter::for(Order::class)
     ->hunt();
 ```
 
----
-
 ## Callbacks and Hooks
 
 ### Complete Lifecycle
@@ -158,8 +172,6 @@ $result = Hunter::for(User::class)
     })
     ->hunt();
 ```
-
----
 
 ## Dry Run and Testing
 
@@ -207,8 +219,6 @@ $result = Hunter::for(Product::class)
 
 echo "Products that would be archived: {$result->successful}\n";
 ```
-
----
 
 ## Progress Tracking
 
@@ -309,8 +319,6 @@ $result = Hunter::for(User::class)
     ->hunt();
 ```
 
----
-
 ## Convenience Methods
 
 ### Advanced Filtering
@@ -374,8 +382,6 @@ $result = Hunter::for(User::class)
     })
     ->hunt();
 ```
-
----
 
 ## Flow Control
 
@@ -474,8 +480,6 @@ $result = Hunter::for(EmailQueue::class)
     })
     ->hunt();
 ```
-
----
 
 ## Advanced Use Cases
 
@@ -610,8 +614,6 @@ echo "- Memory usage: {$result->getFormattedMemoryUsage()}\n";
 // Display results in a beautiful console table
 $result->consoleTable();
 ```
-
----
 
 ## Result Reporting and Display
 
@@ -754,8 +756,6 @@ $result = Hunter::for(Product::class)
     ->hunt();
 ```
 
----
-
 ## Performance Optimization
 
 ### Query Optimization
@@ -818,8 +818,6 @@ $result = Hunter::for(User::class)
     })
     ->hunt();
 ```
-
----
 
 ## Best Practices
 
