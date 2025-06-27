@@ -41,6 +41,10 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/e2tmk/hunter' }
-    ]
+    ],
+
+    search: {
+      provider: "local"
+    }
   }
 })
