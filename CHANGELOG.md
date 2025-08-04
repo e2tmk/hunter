@@ -2,6 +2,19 @@
 
 All notable changes to `hunter` will be documented in this file.
 
+## v1.2.3 - 2025-08-04
+
+### What's Changed
+
+* feat(docs): add local search configuration  by @andrefelipe18 in https://github.com/e2tmk/hunter/pull/7
+* Update examples.md by @kayedspace in https://github.com/e2tmk/hunter/pull/8
+
+### New Contributors
+
+* @kayedspace made their first contribution in https://github.com/e2tmk/hunter/pull/8
+
+**Full Changelog**: https://github.com/e2tmk/hunter/compare/v1.1.2...v1.2.3
+
 ## v1.1.2 - 2025-06-26
 
 ### What's Changed
