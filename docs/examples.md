@@ -1,22 +1,4 @@
-<script setup>
-import { onMounted } from 'vue';
 
-onMounted(() => {
-    const titleLink = document.querySelector('a.title');
-    const span = titleLink?.querySelector('span');
-    span?.remove();
-
-    titleLink.style.display = 'flex';
-    titleLink.style.justifyContent = 'center';
-    titleLink.style.alignItems = 'center';
-
-    titleLink.querySelectorAll('img')?.forEach(img => {
-        img.style.width = '42px';
-        img.style.height = '42px';
-        img.style.marginRight = '8px';
-    });
-});
-</script>
 
 # Hunter Examples
 
