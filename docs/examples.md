@@ -61,8 +61,6 @@ $result = hunter(User::class)
     ->hunt();
 ```
 
-````
-
 ### Search with Operators
 
 ```php
