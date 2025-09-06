@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) e2tmk <dominguesstroppa@gmail.com>
+Copyright (c) e2tmk <info@e2tmk.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

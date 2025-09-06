@@ -6,6 +6,7 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/e2tmk/hunter.svg?style=flat-square)](https://packagist.org/packages/e2tmk/hunter)
 [![Total Downloads](https://img.shields.io/packagist/dt/e2tmk/hunter.svg?style=flat-square)](https://packagist.org/packages/e2tmk/hunter)
+[![License](https://img.shields.io/packagist/l/e2tmk/skeleton-module.svg?style=flat-square)](https://packagist.org/packages/e2tmk/skeleton-module)
 
 Powerful utility for finding and processing Eloquent model records with a fluent, chainable API.
 
