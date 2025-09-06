@@ -13,6 +13,11 @@
             "name": "André Domingues",
             "email": "dominguesstroppa@gmail.com",
             "role": "Developer"
+        },
+        {
+            "name": "Elias Olivtradet",
+            "email": "deoliveira.elias.eus@gmail.com",
+            "role": "Owner"
         }
     ],
     "require": {
